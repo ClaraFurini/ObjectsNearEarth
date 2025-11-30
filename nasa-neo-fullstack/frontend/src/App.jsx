@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate, Link } from 'react-router-dom';
+import { Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Search from './pages/Search.jsx';
 import Insert from './pages/Insert.jsx';
@@ -11,32 +11,34 @@ const PrivateRoute = ({ children }) => {
   return token ? children : <Navigate to="/login" />;
 };
 
-const NavBar = () => (
-  <nav className="nav-bar">
-    <div className="brand">
-      <span className="brand-dot" />
-      <span>NEO Watch</span>
-    </div>
-    <div className="nav-actions">
-      <Link className="nav-link" to="/search">
-        Buscar NEOs
-      </Link>
-      <Link className="nav-link" to="/insert">
-        Inserir NEO
-      </Link>
-      <button
-        className="btn ghost"
-        type="button"
-        onClick={() => {
-          localStorage.removeItem('token');
-          window.location.href = '/login';
-        }}
-      >
-        Sair
-      </button>
-    </div>
-  </nav>
-);
+const NavBar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login', { replace: true });
+  };
+
+  return (
+    <nav className="nav-bar">
+      <div className="brand">
+        <span className="brand-dot" />
+        <span>NEO Watch</span>
+      </div>
+      <div className="nav-actions">
+        <Link className="nav-link" to="/search">
+          Buscar NEOs
+        </Link>
+        <Link className="nav-link" to="/insert">
+          Inserir NEO
+        </Link>
+        <button className="btn ghost" type="button" onClick={handleLogout}>
+          Sair
+        </button>
+      </div>
+    </nav>
+  );
+};
 
 const App = () => (
   <div className="app-shell">

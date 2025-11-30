@@ -6,7 +6,7 @@ const NotFound = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/login';
+    navigate('/login', { replace: true });
   };
 
   return (
