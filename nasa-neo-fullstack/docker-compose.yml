@@ -1,0 +1,55 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: neo-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:7
+    container_name: neo-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    container_name: neo-backend
+    restart: always
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/neo_db
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=changeme
+      - PORT=3001
+    depends_on:
+      - mongo
+      - redis
+    ports:
+      - "3001:3001"
+
+  frontend:
+    build: ./frontend
+    container_name: neo-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+  nginx:
+    image: nginx:alpine
+    container_name: neo-nginx
+    restart: always
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  mongo-data:
