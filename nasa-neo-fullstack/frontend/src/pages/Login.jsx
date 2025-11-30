@@ -21,18 +21,26 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: '400px', display: 'grid', gap: '0.5rem' }}>
-      <label>
-        Email
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      </label>
-      <label>
-        Senha
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      </label>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button type="submit">Entrar</button>
-    </form>
+    <div className="panel">
+      <div className="card">
+        <h2 className="card-title">Acessar painel</h2>
+        <p className="helper">Use suas credenciais para entrar no painel espacial.</p>
+      </div>
+      <form className="card form-grid" onSubmit={handleSubmit}>
+        <label>
+          Email
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        </label>
+        <label>
+          Senha
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </label>
+        {error && <p className="status error">{error}</p>}
+        <button className="btn" type="submit">
+          Entrar
+        </button>
+      </form>
+    </div>
   );
 };
 

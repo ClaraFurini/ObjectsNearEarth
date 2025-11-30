@@ -26,38 +26,49 @@ const Search = () => {
   };
 
   return (
-    <div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.5rem', maxWidth: '500px' }}>
-        <label>
-          Data
-          <input type="date" name="date" value={filters.date} onChange={handleChange} />
-        </label>
-        <label>
-          Distância máxima (km)
-          <input type="number" name="distanceMax" value={filters.distanceMax} onChange={handleChange} />
-        </label>
-        <label>
-          Material
-          <input type="text" name="material" value={filters.material} onChange={handleChange} />
-        </label>
-        <label>
-          Periculosidade
-          <select name="isHazardous" value={filters.isHazardous} onChange={handleChange}>
-            <option value="">Todas</option>
-            <option value="true">Perigoso</option>
-            <option value="false">Não perigoso</option>
-          </select>
-        </label>
+    <div className="panel">
+      <div className="card">
+        <div className="filters-card">
+          <label>
+            Data
+            <input type="date" name="date" value={filters.date} onChange={handleChange} />
+          </label>
+          <label>
+            Distância máxima (km)
+            <input type="number" name="distanceMax" value={filters.distanceMax} onChange={handleChange} />
+          </label>
+          <label>
+            Material
+            <input type="text" name="material" value={filters.material} onChange={handleChange} />
+          </label>
+          <label>
+            Periculosidade
+            <select name="isHazardous" value={filters.isHazardous} onChange={handleChange}>
+              <option value="">Todas</option>
+              <option value="true">Perigoso</option>
+              <option value="false">Não perigoso</option>
+            </select>
+          </label>
+        </div>
+        <button className="btn" type="button" onClick={load}>
+          Buscar
+        </button>
+        {error && <p className="status error">{error}</p>}
       </div>
-      <button style={{ marginTop: '0.5rem' }} type="button" onClick={load}>
-        Buscar
-      </button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <ul>
+      <ul className="neo-list">
         {results.map((neo) => (
-          <li key={neo._id}>
-            <strong>{neo.name}</strong> - {new Date(neo.date).toLocaleDateString()} - {neo.distanceKm} km -
-            {neo.isHazardous ? ' Perigoso' : ' Seguro'} - Material: {neo.material}
+          <li key={neo._id} className="neo-card">
+            <div className="actions-row">
+              <strong>{neo.name}</strong>
+              <span className={`badge ${neo.isHazardous ? 'danger' : 'safe'}`}>
+                {neo.isHazardous ? 'Perigoso' : 'Seguro'}
+              </span>
+            </div>
+            <div className="neo-meta">
+              <span>{new Date(neo.date).toLocaleDateString()}</span>
+              <span>{neo.distanceKm} km</span>
+              <span>Material: {neo.material}</span>
+            </div>
           </li>
         ))}
       </ul>
