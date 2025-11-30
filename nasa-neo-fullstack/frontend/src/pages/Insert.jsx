@@ -36,30 +36,38 @@ const Insert = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '0.5rem', maxWidth: '400px' }}>
-      <label>
-        Nome
-        <input name="name" value={form.name} onChange={handleChange} required />
-      </label>
-      <label>
-        Data
-        <input type="date" name="date" value={form.date} onChange={handleChange} required />
-      </label>
-      <label>
-        Distância (km)
-        <input type="number" name="distanceKm" value={form.distanceKm} onChange={handleChange} required />
-      </label>
-      <label>
-        Material
-        <input name="material" value={form.material} onChange={handleChange} required />
-      </label>
-      <label>
-        Perigoso?
-        <input type="checkbox" name="isHazardous" checked={form.isHazardous} onChange={handleChange} />
-      </label>
-      <button type="submit">Salvar</button>
-      {message && <p>{message}</p>}
-    </form>
+    <div className="panel">
+      <div className="card">
+        <h2 className="card-title">Inserir novo NEO</h2>
+        <p className="helper">Registre um asteroide com dados essenciais para monitoramento.</p>
+      </div>
+      <form className="card form-grid" onSubmit={handleSubmit}>
+        <label>
+          Nome
+          <input name="name" value={form.name} onChange={handleChange} required />
+        </label>
+        <label>
+          Data
+          <input type="date" name="date" value={form.date} onChange={handleChange} required />
+        </label>
+        <label>
+          Distância (km)
+          <input type="number" name="distanceKm" value={form.distanceKm} onChange={handleChange} required />
+        </label>
+        <label>
+          Material
+          <input name="material" value={form.material} onChange={handleChange} required />
+        </label>
+        <label className="actions-row">
+          <input type="checkbox" name="isHazardous" checked={form.isHazardous} onChange={handleChange} />
+          <span>Perigoso?</span>
+        </label>
+        <button className="btn" type="submit">
+          Salvar NEO
+        </button>
+        {message && <p className={`status ${message.includes('sucesso') ? 'success' : 'error'}`}>{message}</p>}
+      </form>
+    </div>
   );
 };
 
