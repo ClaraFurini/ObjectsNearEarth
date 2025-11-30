@@ -8,18 +8,37 @@ const CACHE_PREFIX = 'neo:search:';
 const CACHE_TTL = 60;
 
 const buildCacheKey = (filters) => {
-  const { date, distanceMax, isHazardous, material } = filters;
-  return `${CACHE_PREFIX}${date || 'any'}:${distanceMax || 'any'}:${isHazardous || 'any'}:${material || 'any'}`;
+  const { date, isHazardous } = filters;
+  return `${CACHE_PREFIX}${date || 'any'}:${isHazardous || 'any'}`;
+};
+
+const buildDateRange = (dateString) => {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const start = new Date(date);
+  start.setUTCHours(0, 0, 0, 0);
+
+  const end = new Date(date);
+  end.setUTCHours(23, 59, 59, 999);
+
+  return { $gte: start, $lte: end };
 };
 
 router.get('/neos', authenticate, async (req, res, next) => {
   try {
-    const { date, distanceMax, isHazardous, material } = req.query;
+    const { date, isHazardous } = req.query;
     const filters = {};
-    if (date) filters.date = new Date(date);
-    if (distanceMax) filters.distanceKm = { $lte: Number(distanceMax) };
-    if (typeof isHazardous !== 'undefined') filters.isHazardous = isHazardous === 'true';
-    if (material) filters.material = material;
+    if (date) {
+      const range = buildDateRange(date);
+      if (!range) {
+        return res.status(400).json({ message: 'Data inválida' });
+      }
+      filters.date = range;
+    }
+    if (isHazardous === 'true' || isHazardous === 'false') {
+      filters.isHazardous = isHazardous === 'true';
+    }
 
     const cacheKey = buildCacheKey(req.query);
     const redis = getRedisClient();
