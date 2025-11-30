@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Search from './pages/Search.jsx';
 import Insert from './pages/Insert.jsx';
+import NotFound from './pages/NotFound.jsx';
 import './styles.css';
 
 const PrivateRoute = ({ children }) => {
@@ -73,7 +74,17 @@ const App = () => (
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route
+          path="*"
+          element={
+            <PrivateRoute>
+              <>
+                <NavBar />
+                <NotFound />
+              </>
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </div>
   </div>
