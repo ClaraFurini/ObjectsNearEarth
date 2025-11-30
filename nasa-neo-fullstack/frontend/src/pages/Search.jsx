@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchNeos } from '../services/api.js';
 
 const Search = () => {
-  const [filters, setFilters] = useState({ date: '', distanceMax: '', material: '', isHazardous: '' });
+  const [filters, setFilters] = useState({ date: '', isHazardous: '' });
   const [results, setResults] = useState([]);
   const [error, setError] = useState('');
 
@@ -32,14 +32,6 @@ const Search = () => {
           <label>
             Data
             <input type="date" name="date" value={filters.date} onChange={handleChange} />
-          </label>
-          <label>
-            Distância máxima (km)
-            <input type="number" name="distanceMax" value={filters.distanceMax} onChange={handleChange} />
-          </label>
-          <label>
-            Material
-            <input type="text" name="material" value={filters.material} onChange={handleChange} />
           </label>
           <label>
             Periculosidade
