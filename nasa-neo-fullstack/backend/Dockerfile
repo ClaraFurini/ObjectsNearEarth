@@ -1,4 +1,4 @@
-FROM node:lts
+FROM node:20-slim
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install --production --ignore-scripts && npm cache clean --force

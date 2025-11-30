@@ -22,7 +22,7 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo:27017/neo_db
       - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=changeme
+      - JWT_SECRET=chave1234&3456
       - PORT=3001
     depends_on:
       - mongo
@@ -47,6 +47,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro   
     depends_on:
       - frontend
       - backend

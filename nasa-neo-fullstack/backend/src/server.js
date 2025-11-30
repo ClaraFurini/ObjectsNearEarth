@@ -2,7 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import compression from 'compression';
 import dotenv from 'dotenv';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { connectMongo } from './config/db.js';
 import { connectRedis } from './config/redis.js';
 import { securityMiddlewares } from './middlewares/security.js';
