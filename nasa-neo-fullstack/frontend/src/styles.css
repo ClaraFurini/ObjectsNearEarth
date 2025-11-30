@@ -292,6 +292,16 @@ select:focus {
   align-items: center;
 }
 
+.not-found {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.not-found .actions-row {
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 640px) {
   .nav-bar {
     flex-direction: column;
