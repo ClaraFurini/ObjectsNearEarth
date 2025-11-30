@@ -37,7 +37,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "80:80"
+      - "80"
 
   nginx:
     image: nginx:alpine
