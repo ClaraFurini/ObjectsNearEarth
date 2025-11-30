@@ -18,7 +18,11 @@ export const login = async (email, password) => {
 };
 
 export const fetchNeos = async (filters = {}) => {
-  const { data } = await api.get('/neos', { params: filters });
+  const sanitizedFilters = Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value !== '' && value !== undefined && value !== null),
+  );
+
+  const { data } = await api.get('/neos', { params: sanitizedFilters });
   return data;
 };
 
