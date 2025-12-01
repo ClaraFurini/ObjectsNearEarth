@@ -15,6 +15,14 @@ import Neo from './models/Neo.js';
 dotenv.config();
 
 const app = express();
+app.enable('trust proxy');
+app.use((req, res, next) => {
+  if (process.env.ENFORCE_HTTPS === 'true' && req.headers['x-forwarded-proto'] !== 'https') {
+    const target = `https://${req.headers.host}${req.originalUrl}`;
+    return res.redirect(308, target);
+  }
+  return next();
+});
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(compression());
@@ -27,11 +35,12 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 const ADMIN_EMAIL = 'admin@example.com';
+const SALT_ROUNDS = Number(process.env.SALT_ROUNDS || 12);
 
 const seedUser = async () => {
   const existing = await User.findOne({ email: ADMIN_EMAIL });
   if (!existing) {
-    const passwordHash = await bcrypt.hash('123', 10);
+    const passwordHash = await bcrypt.hash('123', SALT_ROUNDS);
     await User.create({ email: ADMIN_EMAIL, passwordHash, role: 'admin' });
     console.log('Seed user created');
   }
