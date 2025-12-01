@@ -2,6 +2,8 @@ import express from 'express';
 import Neo from '../models/Neo.js';
 import { authenticate } from '../middlewares/auth.js';
 import { getRedisClient } from '../config/redis.js';
+import { logSecurityEvent, logSecurityWarning } from '../utils/logger.js';
+import { ensureNumber, isBooleanString, sanitizeText } from '../utils/validation.js';
 
 const router = express.Router();
 const CACHE_PREFIX = 'neo:search:';
@@ -32,11 +34,12 @@ router.get('/neos', authenticate, async (req, res, next) => {
     if (date) {
       const range = buildDateRange(date);
       if (!range) {
+        logSecurityWarning('SEARCH_INVALID_DATE', { ip: req.ip, date });
         return res.status(400).json({ message: 'Data inválida' });
       }
       filters.date = range;
     }
-    if (isHazardous === 'true' || isHazardous === 'false') {
+    if (isBooleanString(isHazardous)) {
       filters.isHazardous = isHazardous === 'true';
     }
 
@@ -45,6 +48,7 @@ router.get('/neos', authenticate, async (req, res, next) => {
     if (redis) {
       const cached = await redis.get(cacheKey);
       if (cached) {
+        logSecurityEvent('SEARCH_CACHE_HIT', { ip: req.ip, cacheKey });
         return res.json(JSON.parse(cached));
       }
     }
@@ -53,6 +57,7 @@ router.get('/neos', authenticate, async (req, res, next) => {
     if (redis) {
       await redis.set(cacheKey, JSON.stringify(neos), 'EX', CACHE_TTL);
     }
+    logSecurityEvent('SEARCH_EXECUTED', { ip: req.ip, filters: Object.keys(filters) });
     return res.json(neos);
   } catch (err) {
     return next(err);
@@ -62,16 +67,26 @@ router.get('/neos', authenticate, async (req, res, next) => {
 router.post('/neos', authenticate, async (req, res, next) => {
   try {
     const { name, date, distanceKm, isHazardous, material } = req.body || {};
-    if (!name || !date || distanceKm === undefined || isHazardous === undefined || !material) {
+    const sanitizedName = sanitizeText(name || '');
+    const sanitizedMaterial = sanitizeText(material || '');
+    const numericDistance = ensureNumber(distanceKm);
+    if (
+      !sanitizedName ||
+      !date ||
+      numericDistance === null ||
+      typeof isHazardous !== 'boolean' ||
+      !sanitizedMaterial
+    ) {
+      logSecurityWarning('CREATE_VALIDATION_FAILED', { ip: req.ip, userId: req.user.id });
       return res.status(400).json({ message: 'All fields are required' });
     }
 
     const neo = await Neo.create({
-      name,
+      name: sanitizedName,
       date,
-      distanceKm,
+      distanceKm: numericDistance,
       isHazardous,
-      material,
+      material: sanitizedMaterial,
       createdBy: req.user.id,
     });
 
@@ -83,6 +98,7 @@ router.post('/neos', authenticate, async (req, res, next) => {
       }
     }
 
+    logSecurityEvent('CREATE_NEO', { ip: req.ip, userId: req.user.id, neoId: neo._id.toString() });
     return res.status(201).json(neo);
   } catch (err) {
     return next(err);
